@@ -40,6 +40,7 @@ git branch -M main
 git remote add origin git@github.com:yourusername/repo-name.git
 git push -u origin main
 ```
+---
 
 # 1 — Docker Setup
 
@@ -850,10 +851,14 @@ Create a detailed ```README.md``` covering: project overview, functional and non
 - **Graceful shutdown** — flush in-flight requests, wait for active Celery tasks, close DB connections cleanly
 - **Multi-environment** — separate `.env.development` and `.env.production` configs, staging Droplet to verify before promoting to production
 
+---
+
 ## CSV / File Ingestion
 
 - Needs `python-multipart` in `requirements.txt`
 - FastAPI uses `UploadFile` instead of a request body
+
+---
 
 ## Architecture Cheat Sheet
 
@@ -894,3 +899,37 @@ Business logic and rules. No HTTP code. Raises `ValueError`.
 **Routes**
 Thin layer only. Calls service, returns schema. Translates `ValueError` → `HTTPException`.
 `POST, GET /list, GET /{id}, PATCH /{id}, DELETE /{id}`
+
+---
+
+## FastAPI Fundamentals
+
+- **Why `lifespan` instead of `@app.on_event`** — the latter is deprecated
+- **Why both `fastapi.HTTPException` and `starlette.exceptions.HTTPException` need handlers** — FastAPI is built on Starlette, and 404s for unknown routes are raised by Starlette before FastAPI sees them
+- **Why `Header(default=None)` instead of `Header(...)` in `verify_api_key`** — required headers return 422 instead of 401 when missing
+- **Why `secrets.compare_digest` instead of `==`** — constant-time comparison prevents timing attacks
+
+## SQLAlchemy Async
+
+- **Why `async_sessionmaker` instead of `sessionmaker`** — thread-safe session factory for async contexts
+- **Why `get_db` uses `yield` with `try/finally`** — ensures session closes even if the route raises an exception
+- **Why `from_attributes = True` on `JobResponse`** — lets Pydantic read from ORM object attributes instead of dict keys
+
+## Architecture Decisions
+
+- **Why repository layer exists** — isolates raw queries so the service layer never touches SQL directly; easier to mock in unit tests
+- **Why service raises `ValueError` instead of `HTTPException`** — keeps business logic decoupled from HTTP; routes translate errors at the boundary
+- **Why unit tests mock the repository with `AsyncMock` instead of hitting the database** — fast, isolated, tests logic not infrastructure
+- **Why `create_all` on startup instead of Alembic** — acceptable for a greenfield interview project; you should mention Alembic as the production alternative unprompted
+
+## Deployment
+
+- **Why `rsync` instead of `scp` in `deploy.sh`** — incremental sync, skips unchanged files, faster on repeat deploys
+- **Why `pg_isready` healthcheck on postgres** — ensures the app container only starts after postgres is actually accepting connections, not just running
+- **Why `restart: always`** — auto-recovers containers after crashes or droplet reboots
+
+## Testing
+
+- **Why `asyncio_mode = auto` in `pytest.ini`** — avoids having to decorate every async test with `@pytest.mark.asyncio`
+- **Why `drop_all` / `create_all` per test instead of per session** — guarantees clean state, prevents test ordering bugs
+- **Why `scheduler_test_db` instead of reusing `scheduler_db`** — never run tests against your dev database
