@@ -846,3 +846,52 @@ Create a detailed ```README.md``` covering: project overview, functional and non
 
 - Needs `python-multipart` in `requirements.txt`
 - FastAPI uses `UploadFile` instead of a request body
+
+## Good to know's
+
+### File structure
+in the order of what to build first: models, schemas, repositories, services, api->routes, workers
+
+### Where does what go
+
+Does it define how data is stored in the database? → models
+- Database table structure
+- Column types and constraints
+- Relationships between tables
+
+Does it define what JSON looks like coming in or going out? → schemas
+- Request body shape
+- Response shape
+- Input validation rules
+- Error response shape
+
+Does it involve a raw database query? → repository
+- SELECT, INSERT, UPDATE, DELETE
+- Filtering, ordering, pagination
+- Nothing else
+
+Does it involve a business decision? → service
+- Duplicate checking
+- Validation logic beyond basic types
+- Orchestrating multiple repository calls
+- Deciding what status a job should have
+- Enqueuing Celery tasks
+
+Does it involve HTTP? → routes
+- Receiving requests
+- Calling the service
+- Returning responses
+- HTTP status codes
+- Nothing else
+
+Does it involve background processing after the API has already responded? → workers
+- Processing a job asynchronously
+- Updating job status after work is done
+- Sending emails, transforming data, calling external APIs
+- Anything that shouldn't block the API response
+
+Is it a shared utility used across all layers? → core
+- Logging setup
+- Custom exceptions
+- Shared middleware
+- Security utilities
