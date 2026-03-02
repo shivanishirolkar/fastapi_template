@@ -836,3 +836,8 @@ Using your actual `DROPLET_IP` and `API_KEY`:
 - **Horizontal scaling** — move rate limiter storage to Redis, tune Celery worker pool size
 - **Graceful shutdown** — flush in-flight requests, wait for active Celery tasks, close DB connections cleanly
 - **Multi-environment** — separate `.env.development` and `.env.production` configs, staging Droplet to verify before promoting to production
+
+# CSV / File Ingestion
+
+- Needs `python-multipart` in `requirements.txt`
+- FastAPI uses `UploadFile` instead of a request body
