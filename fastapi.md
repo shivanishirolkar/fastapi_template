@@ -1,3 +1,46 @@
+# Step 0 — Git & GitHub Setup
+
+## 1. Configure Git
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your@email.com"
+```
+
+## 2. Generate SSH Key and Add to GitHub
+```bash
+ssh-keygen -t ed25519 -C "your@email.com"
+# hit enter for all defaults
+cat ~/.ssh/id_ed25519.pub
+# copy output, go to GitHub → Settings → SSH Keys → New SSH Key → paste
+```
+
+## 3. Test the Connection
+```bash
+ssh -T git@github.com
+# should say: Hi username! You've successfully authenticated
+```
+
+## 4. Create the Repo
+- Go to github.com → New repository
+- Name it, set **private**, **do not initialize with README**
+- Copy the SSH remote URL
+
+## 5. Initialize and Push
+```bash
+mkdir project && cd project
+git init
+echo ".env
+__pycache__
+*.pyc
+.pytest_cache
+.coverage" > .gitignore
+git add .gitignore
+git commit -m "initial commit"
+git branch -M main
+git remote add origin git@github.com:yourusername/repo-name.git
+git push -u origin main
+```
+
 # 1 — Docker Setup
 
 ## Prerequisite
@@ -231,19 +274,13 @@ Write async tests for these cases:
    - **RAM**: 1GB, **CPU**: 1 vCPU, **SSD**: 25GB
    - **Region**: San Francisco
 
-2. Generate an SSH key on your local machine:
-   ```bash
-   ssh-keygen -t ed25519 -C "your-name"
-   # Hit Enter for all defaults
-   ```
-
-3. Copy the public key:
+2. Copy the public key:
    ```bash
    cat ~/.ssh/id_ed25519.pub
    ```
    Add it to the Droplet during creation under **Authentication → SSH Keys**.
 
-4. Once created, copy the **public IPv4** from the DigitalOcean dashboard.
+3. Once created, copy the **public IPv4** from the DigitalOcean dashboard.
 
 ## Install Docker on the Droplet
 SSH into the Droplet and install Docker:
