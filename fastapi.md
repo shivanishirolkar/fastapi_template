@@ -825,10 +825,10 @@ Using your actual `DROPLET_IP` and `API_KEY`:
 ./scripts/deploy.sh
 ```
 
-# 23 — Final Cleanup & Deployment
+# 23 — Documentation and How to run on Droplet
 
 ## ```README.md```
-Create a detailed README.md covering: project overview, functional and non-functional requirements, full API reference (method, path, request/response, error codes), data model, local setup with Docker, deploying to DigitalOcean via scripts/deploy.sh, how to run tests, and future development. Write in clear technical prose.
+Create a detailed ```README.md``` covering: project overview, functional and non-functional requirements, full API reference (method, path, request/response, error codes), data model, local setup with Docker, deploying to DigitalOcean via ```scripts/deploy.sh```, how to run tests, and future development. Write in clear technical prose.
 
 ---
 
