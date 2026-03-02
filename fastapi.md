@@ -323,7 +323,30 @@ Do not include the `X-API-Key` header yet — authentication is added in prompt 
 
 ---
 
-# 8 — API Contract
+# 8 — Job Model
+
+## `app/models/job_model.py`
+SQLAlchemy model only — no database connection or business logic. Table name: `jobs`.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | `UUID` | primary key, auto-generated |
+| `name` | `String` | not null |
+| `status` | `Enum(JobStatus)` | not null, defaults to `PENDING` |
+| `priority` | `Enum(JobPriority)` | not null, defaults to `NORMAL` |
+| `payload` | `JSON` | not null |
+| `scheduled_at` | `DateTime(timezone=True)` | nullable |
+| `started_at` | `DateTime(timezone=True)` | nullable |
+| `completed_at` | `DateTime(timezone=True)` | nullable |
+| `result` | `JSON` | nullable |
+| `created_at` | `DateTime(timezone=True)` | not null, auto-set on insert |
+| `updated_at` | `DateTime(timezone=True)` | not null, auto-set on insert and update |
+
+Import `JobStatus` and `JobPriority` from `app.schemas.job_schema` — do not redefine them.
+
+---
+
+# 9 — API Contract
 
 ## `app/schemas/job_schema.py`
 Schemas only — no database or business logic.
@@ -341,6 +364,14 @@ Schemas only — no database or business logic.
 | `scheduled_at` | `datetime` | no | optional, timezone-aware |
 
 Add a `@field_validator` on `payload` that rejects an empty dict with `ValueError("payload must not be empty")`.
+
+### `JobUpdate`
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `name` | `str \| None` | no | Only include to change |
+| `payload` | `dict \| None` | no | Only include to change |
+| `priority` | `JobPriority \| None` | no | Only include to change |
+| `scheduled_at` | `datetime \| None` | no | Only include to change |
 
 ### `JobResponse`
 | Field | Type | Required | Notes |
@@ -374,29 +405,6 @@ Enable `from_attributes = True` so it can be constructed from a SQLAlchemy model
 | `details` | `any` | optional, validation errors only |
 
 Update all exception handlers in `app/main.py` to use `ErrorResponse` as the response body.
-
----
-
-# 9 — Job Model
-
-## `app/models/job_model.py`
-SQLAlchemy model only — no database connection or business logic. Table name: `jobs`.
-
-| Column | Type | Notes |
-|---|---|---|
-| `id` | `UUID` | primary key, auto-generated |
-| `name` | `String` | not null |
-| `status` | `Enum(JobStatus)` | not null, defaults to `PENDING` |
-| `priority` | `Enum(JobPriority)` | not null, defaults to `NORMAL` |
-| `payload` | `JSON` | not null |
-| `scheduled_at` | `DateTime(timezone=True)` | nullable |
-| `started_at` | `DateTime(timezone=True)` | nullable |
-| `completed_at` | `DateTime(timezone=True)` | nullable |
-| `result` | `JSON` | nullable |
-| `created_at` | `DateTime(timezone=True)` | not null, auto-set on insert |
-| `updated_at` | `DateTime(timezone=True)` | not null, auto-set on insert and update |
-
-Import `JobStatus` and `JobPriority` from `app.schemas.job_schema` — do not redefine them.
 
 ---
 
@@ -470,7 +478,7 @@ Create the file. Add one test:
 # 12 — Repository
 
 ## `app/repositories/job_repository.py`
-Raw database queries only — no business logic, no validation, no HTTP code. Implement exactly these five async functions:
+Raw database queries only — no business logic, no validation, no HTTP code. Implement these async functions:
 
 ### `create_job(db, job_data: JobCreate) -> Job`
 Insert a new row from `job_data` and return the created instance.
